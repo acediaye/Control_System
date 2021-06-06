@@ -48,7 +48,7 @@ class Simulation(object):
         marker.penup()
         marker.speed(0)
         marker.left(180)
-        marker.goto(15, SETPOINT)
+        marker.goto(10, SETPOINT)
         marker.color('red')
 
     def loop(self):
@@ -110,10 +110,11 @@ class Rocket(object):
     # plant
     def __init__(self):
         self.rocket = turtle.Turtle()
-        self.rocket.shape('square')
+        self.rocket.shape('turtle')
         self.rocket.color('black')
         self.rocket.penup()
         self.rocket.speed(0)
+        self.rocket.left(90)
         self.rocket.goto(INITIAL_X, INITIAL_Y)
         # physics
         self.acc = INITIAL_A  # vertical accel
