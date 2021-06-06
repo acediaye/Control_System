@@ -5,7 +5,7 @@ import turtle
 # global params
 TIME_STEP = 0.1  # sec
 END_TIME = 100  # sec
-SETPOINT = 10
+SETPOINT = 10  # r
 INITIAL_X = 0
 INITIAL_Y = -100
 INITIAL_V = 0  # initial velocity
@@ -151,7 +151,7 @@ class PID(object):
         self.kp = KP
         self.ki = KI
         self.kd = KD
-        self.setpoint = target
+        self.setpoint = target  # r
         self.error = 0
         self.prev_error = 0
         self.proportional_error = 0
@@ -161,13 +161,13 @@ class PID(object):
 
     def compute(self, position):
         # position is signal y
-        self.error = self.setpoint - position
+        self.error = self.setpoint - position  # e = r - y
         self.proportional_error = self.error
         self.integral_error += self.error * TIME_STEP
         self.derivative_error = (self.error - self.prev_error) / TIME_STEP
         self.output = (self.kp * self.proportional_error
                        + self.ki * self.integral_error
-                       + self.kd * self.derivative_error)
+                       + self.kd * self.derivative_error)  # y
         self.prev_error = self.error
         # saturation
         if self.output > MAX_THRUST:
