@@ -30,9 +30,13 @@ y_arr = np.array([])
 r_arr = np.array([])
 e_arr = np.array([])
 
+KP = 0.6
+KI = 0.06666
+KD = 1.35
+
 
 if __name__ == '__main__':
-    mypid = pid.PID(0.6, 0.06666, 1.35, REFERENCE)
+    mypid = pid.PID(1, 0, 0, REFERENCE)
     mymodel = model()
     for t in np.arange(TIME_STEP, END_TIME+TIME_STEP, TIME_STEP):
         u = mypid.controller(mymodel.get_pos(), t)
