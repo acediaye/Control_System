@@ -5,9 +5,9 @@ import turtle
 # global params
 TIME_STEP = 0.1  # sec
 END_TIME = 100  # sec
-SETPOINT = 10  # r
+SETPOINT = 100  # r
 INITIAL_X = 0
-INITIAL_Y = -100
+INITIAL_Y = 0
 INITIAL_V = 0  # initial velocity
 INITIAL_A = 0
 MASS = 1  # kg
@@ -29,11 +29,11 @@ class Simulation(object):
     def __init__(self):
         self.screen = turtle.Screen()
         self.screen.setup(600, 400)
-        self.init_marker()
+        self.marker = Marker()
         self.rocket = Rocket()
         self.pid = PID(KP, KI, KD, SETPOINT)
         self.sim = True
-        self.timer = 0
+        self.time = 0
         self.times = np.array([])  # t
         self.height = np.array([])  # y
         self.thrust_arr = np.array([])  # u
@@ -42,35 +42,33 @@ class Simulation(object):
         self.kie = np.array([])
         self.kde = np.array([])
         self.count = 0
-
-    def init_marker(self):
-        marker = turtle.Turtle()
-        marker.penup()
-        marker.speed(0)
-        marker.left(180)
-        marker.goto(10, SETPOINT)
-        marker.color('red')
+        self.loop()
 
     def loop(self):
         while(self.sim):
-            # get thrust, u output from our PID
-            thrust = self.pid.compute(self.rocket.get_pos())
+            # get thrust, u output from PID
+            thrust = self.pid.controller(self.rocket.get_pos())
             self.rocket.set_acc(thrust)
             self.rocket.set_vel()
             self.rocket.set_pos()
-            self.timer += TIME_STEP
+            self.time += TIME_STEP
             self.count += 1
-            if self.timer > END_TIME:
+            if self.time > END_TIME/2:
+                print('back to ground')
+                new_target = 0
+                self.marker.set_target(new_target)
+                self.pid.set_target(new_target)
+            if self.time > END_TIME:
                 print('sim end')
                 self.sim = False
             # out of bounds
-            elif self.rocket.get_pos() > 800:
+            elif self.rocket.get_pos() > 1000:
                 print('sim end')
                 self.sim = False
-            elif self.rocket.get_pos() < -800:
+            elif self.rocket.get_pos() < -1000:
                 print('sim end')
                 self.sim = False
-            self.times = np.append(self.times, self.timer)
+            self.times = np.append(self.times, self.time)
             self.height = np.append(self.height, self.rocket.get_pos())  # y
             self.error_arr = np.append(self.error_arr, self.pid.get_err())  # e
             self.kpe = np.append(self.kpe, self.pid.get_kpe())
@@ -106,6 +104,20 @@ class Simulation(object):
         plt.show()
 
 
+class Marker(object):
+    def __init__(self):
+        self.marker = turtle.Turtle()
+        self.marker.shape('arrow')
+        self.marker.color('red')
+        self.marker.penup()
+        self.marker.speed(0)
+        self.marker.left(180)
+        self.marker.goto(20, SETPOINT)
+
+    def set_target(self, position):
+        self.marker.goto(10, position)
+
+
 class Rocket(object):
     # plant
     def __init__(self):
@@ -122,7 +134,7 @@ class Rocket(object):
         self.pos = INITIAL_Y
 
     def set_acc(self, thrust):
-        self.acc = g + thrust / MASS
+        self.acc = g + thrust / MASS  # m/s^2 = N / kg
         print(f'accel: {self.acc}')
 
     def get_acc(self):
@@ -159,7 +171,7 @@ class PID(object):
         self.derivative_error = 0
         self.output = 0
 
-    def compute(self, position):
+    def controller(self, position):
         # position is signal y
         self.error = self.setpoint - position  # e = r - y
         self.proportional_error = self.error
@@ -174,7 +186,8 @@ class PID(object):
             self.output = MAX_THRUST
         elif self.output < 0:
             self.output = 0
-        print(f'out: {self.output}')
+        print(f'u: {self.output}, r: {self.setpoint}, '
+              f'y: {position}, e: {self.error}')
         return self.output  # output is signal u
 
     def get_err(self):
@@ -189,7 +202,9 @@ class PID(object):
     def get_kde(self):
         return self.kd * self.derivative_error
 
+    def set_target(self, target):
+        self.setpoint = target
+
 
 if __name__ == '__main__':
     sim = Simulation()
-    sim.loop()
