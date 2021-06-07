@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import turtle
+import time
 
 # global params
 TIME_STEP = 0.1  # sec
@@ -30,6 +31,7 @@ class Simulation(object):
         self.screen = turtle.Screen()
         self.screen.setup(600, 400)
         self.marker = Marker()
+        time.sleep(2)
         self.rocket = Rocket()
         self.pid = PID(KP, KI, KD, SETPOINT)
         self.sim = True

@@ -16,5 +16,6 @@ Set Ki and Kd to 0 and increase Kp until the output of the loop have steady osci
 
 ## Plots
 Rocket goes up to 100 m and hovers, then comes back down to ground. Have not yet account for dropping through ground.\
+![alt text](pics/rocket.gif)
 ![alt text](pics/rocket_up.PNG)\
 ![alt text](pics/rocket_up_down.PNG)
