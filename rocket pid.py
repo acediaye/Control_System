@@ -54,7 +54,6 @@ class Simulation(object):
             self.time += TIME_STEP
             self.count += 1
             if self.time > END_TIME/2:
-                print('back to ground')
                 new_target = 0
                 self.marker.set_target(new_target)
                 self.pid.set_target(new_target)
@@ -83,13 +82,13 @@ class Simulation(object):
         plt.figure(1)
         plt.subplot(3, 2, 1)
         plt.plot(t, y)
-        plt.ylabel('height')
+        plt.ylabel('height')  # y
         plt.subplot(3, 2, 2)
         plt.plot(t, u)
-        plt.ylabel('thrust')
+        plt.ylabel('thrust')  # u
         plt.subplot(3, 2, 3)
         plt.plot(t, e)
-        plt.ylabel('error')
+        plt.ylabel('error')  # e
 
         plt.subplot(3, 2, 4)
         plt.plot(t, kpe)
@@ -97,6 +96,7 @@ class Simulation(object):
         plt.subplot(3, 2, 5)
         plt.plot(t, kie)
         plt.ylabel('kie')
+        plt.xlabel('seconds')
         plt.subplot(3, 2, 6)
         plt.plot(t, kde)
         plt.ylabel('kde')
@@ -107,6 +107,10 @@ class Simulation(object):
 class Marker(object):
     def __init__(self):
         self.marker = turtle.Turtle()
+        self.marker.speed(0)
+        self.marker.goto(-100, 0)
+        self.marker.forward(200)
+
         self.marker.shape('arrow')
         self.marker.color('red')
         self.marker.penup()
@@ -115,7 +119,7 @@ class Marker(object):
         self.marker.goto(20, SETPOINT)
 
     def set_target(self, position):
-        self.marker.goto(10, position)
+        self.marker.goto(20, position)
 
 
 class Rocket(object):
