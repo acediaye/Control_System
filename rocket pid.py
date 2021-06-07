@@ -30,6 +30,7 @@ class Simulation(object):
     def __init__(self):
         self.screen = turtle.Screen()
         self.screen.setup(600, 400)
+        self.screen.title('rocket')
         self.marker = Marker()
         # time.sleep(2)
         self.rocket = Rocket()
