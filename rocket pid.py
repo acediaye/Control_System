@@ -13,6 +13,7 @@ INITIAL_V = 0  # initial velocity
 INITIAL_A = 0
 MASS = 1  # kg
 MAX_THRUST = 20  # newtons
+MAX_WINDUP = 20
 g = -9.8  # gravity
 
 # PID ziegler nichols method
@@ -183,6 +184,11 @@ class PID(object):
         self.error = self.setpoint - position  # e = r - y
         self.proportional_error = self.error
         self.integral_error += self.error * TIME_STEP
+        # capping integral error 
+        # if self.integral_error > MAX_WINDUP:
+        #     self.integral_error = MAX_WINDUP
+        # elif self.integral_error < -MAX_WINDUP:
+        #     self.integral_error = -MAX_WINDUP
         self.derivative_error = (self.error - self.prev_error) / TIME_STEP
         self.output = (self.kp * self.proportional_error
                        + self.ki * self.integral_error
