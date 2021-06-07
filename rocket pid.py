@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import turtle
+# import pid
 import time
 
 # global params
@@ -36,12 +37,13 @@ class Simulation(object):
         # time.sleep(2)
         self.rocket = Rocket()
         self.pid = PID(KP, KI, KD, SETPOINT)
+        # self.pid = pid.PID(KP, KI, KD, SETPOINT)
         self.sim = True
-        self.time = 0
+        self.time = TIME_STEP
         self.times = np.array([])  # t
         self.height = np.array([])  # y
         self.thrust_arr = np.array([])  # u
-        self.error_arr = np.array([])  # e
+        self.err_arr = np.array([])  # e
         self.kpe = np.array([])
         self.kie = np.array([])
         self.kde = np.array([])
@@ -52,6 +54,7 @@ class Simulation(object):
         while(self.sim):
             # get thrust, u output from PID
             thrust = self.pid.controller(self.rocket.get_pos())
+            # thrust = self.pid.controller(self.rocket.get_pos(), self.time)
             self.rocket.set_acc(thrust)
             self.rocket.set_vel()
             self.rocket.set_pos()
@@ -59,8 +62,8 @@ class Simulation(object):
             self.count += 1
             if self.time > END_TIME/2:
                 new_target = 0
-                self.marker.set_target(new_target)
-                self.pid.set_target(new_target)
+                self.marker.set_reference(new_target)
+                self.pid.set_reference(new_target)
             if self.time > END_TIME:
                 print('sim end')
                 self.sim = False
@@ -73,13 +76,13 @@ class Simulation(object):
                 self.sim = False
             self.times = np.append(self.times, self.time)
             self.height = np.append(self.height, self.rocket.get_pos())  # y
-            self.error_arr = np.append(self.error_arr, self.pid.get_err())  # e
+            self.err_arr = np.append(self.err_arr, self.pid.get_error())  # e
             self.kpe = np.append(self.kpe, self.pid.get_kpe())
             self.kie = np.append(self.kie, self.pid.get_kie())
             self.kde = np.append(self.kde, self.pid.get_kde())
             self.thrust_arr = np.append(self.thrust_arr, thrust)  # u
         self.graph(self.times, self.height, self.thrust_arr,
-                   self.error_arr, self.kpe, self.kie, self.kde)
+                   self.err_arr, self.kpe, self.kie, self.kde)
         print(f'count: {self.count}')
 
     def graph(self, t, y, u, e, kpe, kie, kde):
@@ -122,7 +125,7 @@ class Marker(object):
         self.marker.left(180)
         self.marker.goto(20, SETPOINT)
 
-    def set_target(self, position):
+    def set_reference(self, position):
         self.marker.goto(20, position)
 
 
@@ -184,7 +187,7 @@ class PID(object):
         self.error = self.setpoint - position  # e = r - y
         self.proportional_error = self.error
         self.integral_error += self.error * TIME_STEP
-        # capping integral error 
+        # capping integral error
         # if self.integral_error > MAX_WINDUP:
         #     self.integral_error = MAX_WINDUP
         # elif self.integral_error < -MAX_WINDUP:
@@ -203,7 +206,7 @@ class PID(object):
               f'y: {position}, e: {self.error}')
         return self.output  # output is signal u
 
-    def get_err(self):
+    def get_error(self):
         return self.error
 
     def get_kpe(self):
@@ -215,7 +218,7 @@ class PID(object):
     def get_kde(self):
         return self.kd * self.derivative_error
 
-    def set_target(self, target):
+    def set_reference(self, target):
         self.setpoint = target
 
 
