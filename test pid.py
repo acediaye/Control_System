@@ -12,13 +12,15 @@ class model(object):
         self.pos = 0
         self.vel = 0
         self.acc = 0
+        self.output = 0
 
     def func(self, input):
-        # output = input*REFERENCE
+        # self.output += input*REFERENCE
         self.acc = -9.8 + input / 1
         self.vel += self.acc * TIME_STEP
         self.pos += self.vel * TIME_STEP
-        return self.pos
+        self.output = self.pos
+        return self.output
 
     def get_pos(self):
         return self.pos
