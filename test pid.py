@@ -47,6 +47,9 @@ if __name__ == '__main__':
     for i in range(len(TIME)):
         t = TIME[i]
         r = REFERENCE[i]
+        # a = 1
+        # f = 0.1
+        # r = a * np.sin(2*np.pi*f*t)
         u = mypid.controller(r, mymodel.get_pos(), t)
         y = mymodel.excite(u)
         time_arr = np.append(time_arr, t)
