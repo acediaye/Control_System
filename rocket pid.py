@@ -1,13 +1,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import turtle
-# import pid
 import time
 
 # global params
 TIME_STEP = 0.1  # sec
 END_TIME = 100  # sec
-SETPOINT = 100  # r
+SETPOINT = 100
+TIME = np.arange(0+TIME_STEP, END_TIME+TIME_STEP, TIME_STEP)
+print(len(TIME))
+REFERENCE = np.append(SETPOINT * np.ones(int(len(TIME)/2)),
+                      np.zeros(int(len(TIME)/2)))
 INITIAL_X = 0
 INITIAL_Y = 0
 INITIAL_V = 0  # initial velocity
@@ -19,7 +22,7 @@ g = -9.8  # gravity
 
 # PID ziegler nichols method
 KU = 1  # consistent oscillations
-TU = 18  # seconds, oscillation period  # 27 - 9
+TU = 17  # seconds, oscillation period  # 25.5 - 8.5
 KP = 0.6*KU
 KI = 1.2*KU/TU
 KD = 0.075*KU*TU
@@ -35,12 +38,10 @@ class Simulation(object):
         self.screen.title('rocket')
         self.marker = Marker()
         # time.sleep(2)
-        self.rocket = Rocket()
-        self.pid = PID(KP, KI, KD, SETPOINT)
-        # self.pid = pid.PID(KP, KI, KD, SETPOINT)
-        self.sim = True
-        self.time = TIME_STEP
+        self.rocket = Rocket(g, MASS)
+        self.pid = PID(KP, KI, KD)
         self.times = np.array([])  # t
+        self.r_arr = np.array([])  # r
         self.height = np.array([])  # y
         self.thrust_arr = np.array([])  # u
         self.err_arr = np.array([])  # e
@@ -51,44 +52,33 @@ class Simulation(object):
         self.loop()
 
     def loop(self):
-        while(self.sim):
-            # get thrust, u output from PID
-            thrust = self.pid.controller(self.rocket.get_pos())
-            # thrust = self.pid.controller(self.rocket.get_pos(), self.time)
+        for i in range(len(TIME)):
+            t = TIME[i]
+            r = REFERENCE[i]
+            self.marker.set_reference(r)
+            thrust = self.pid.controller(r, self.rocket.get_pos(), t)
             self.rocket.set_acc(thrust)
             self.rocket.set_vel()
             self.rocket.set_pos()
-            self.time += TIME_STEP
             self.count += 1
-            if self.time > END_TIME/2:
-                new_target = 0
-                self.marker.set_reference(new_target)
-                self.pid.set_reference(new_target)
-            if self.time > END_TIME:
-                print('sim end')
-                self.sim = False
-            # out of bounds
-            elif self.rocket.get_pos() > 1000:
-                print('sim end')
-                self.sim = False
-            elif self.rocket.get_pos() < -1000:
-                print('sim end')
-                self.sim = False
-            self.times = np.append(self.times, self.time)
+
+            self.times = np.append(self.times, t)
+            self.r_arr = np.append(self.r_arr, r)
             self.height = np.append(self.height, self.rocket.get_pos())  # y
             self.err_arr = np.append(self.err_arr, self.pid.get_error())  # e
             self.kpe = np.append(self.kpe, self.pid.get_kpe())
             self.kie = np.append(self.kie, self.pid.get_kie())
             self.kde = np.append(self.kde, self.pid.get_kde())
             self.thrust_arr = np.append(self.thrust_arr, thrust)  # u
-        self.graph(self.times, self.height, self.thrust_arr,
+        self.graph(self.times, self.r_arr, self.height, self.thrust_arr,
                    self.err_arr, self.kpe, self.kie, self.kde)
         print(f'count: {self.count}')
 
-    def graph(self, t, y, u, e, kpe, kie, kde):
+    def graph(self, t, r, y, u, e, kpe, kie, kde):
         plt.figure(1)
         plt.subplot(3, 2, 1)
         plt.plot(t, y)
+        plt.plot(t, r)
         plt.ylabel('height')  # y
         plt.subplot(3, 2, 2)
         plt.plot(t, u)
@@ -131,7 +121,7 @@ class Marker(object):
 
 class Rocket(object):
     # plant
-    def __init__(self):
+    def __init__(self, g, mass):
         self.rocket = turtle.Turtle()
         self.rocket.shape('turtle')
         self.rocket.color('black')
@@ -143,9 +133,12 @@ class Rocket(object):
         self.acc = INITIAL_A  # vertical accel
         self.vel = INITIAL_V
         self.pos = INITIAL_Y
+        self.g = g
+        self.mass = mass
 
     def set_acc(self, thrust):
-        self.acc = g + thrust / MASS  # m/s^2 = N / kg
+        # thrust is in newton, accel = force / mass
+        self.acc = self.g + thrust / self.mass  # m/s^2 = N / kg
         print(f'accel: {self.acc}')
 
     def get_acc(self):
@@ -170,39 +163,42 @@ class Rocket(object):
 
 class PID(object):
     # controller
-    def __init__(self, KP, KI, KD, target):
+    def __init__(self, KP, KI, KD):
         self.kp = KP
         self.ki = KI
         self.kd = KD
-        self.setpoint = target  # r
+        # self.setpoint = 0  # r
         self.error = 0
         self.prev_error = 0
+        self.prev_time = 0
         self.proportional_error = 0
         self.integral_error = 0
         self.derivative_error = 0
         self.output = 0
 
-    def controller(self, position):
+    def controller(self, reference, position, time):
         # position is signal y
-        self.error = self.setpoint - position  # e = r - y
+        self.error = reference - position  # e = r - y
         self.proportional_error = self.error
-        self.integral_error += self.error * TIME_STEP
+        self.integral_error += self.error * (time - self.prev_time)
         # capping integral error
         # if self.integral_error > MAX_WINDUP:
         #     self.integral_error = MAX_WINDUP
         # elif self.integral_error < -MAX_WINDUP:
         #     self.integral_error = -MAX_WINDUP
-        self.derivative_error = (self.error - self.prev_error) / TIME_STEP
+        self.derivative_error = ((self.error - self.prev_error)
+                                 / (time - self.prev_time))
         self.output = (self.kp * self.proportional_error
                        + self.ki * self.integral_error
                        + self.kd * self.derivative_error)  # y
         self.prev_error = self.error
+        self.prev_time = time
         # saturation
         if self.output > MAX_THRUST:
             self.output = MAX_THRUST
         elif self.output < 0:
             self.output = 0
-        print(f'u: {self.output}, r: {self.setpoint}, '
+        print(f'u: {self.output}, r: {reference}, '
               f'y: {position}, e: {self.error}')
         return self.output  # output is signal u
 
@@ -217,9 +213,6 @@ class PID(object):
 
     def get_kde(self):
         return self.kd * self.derivative_error
-
-    def set_reference(self, target):
-        self.setpoint = target
 
 
 if __name__ == '__main__':

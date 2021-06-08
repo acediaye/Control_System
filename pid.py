@@ -5,11 +5,10 @@ MAX_INTEGRAL = 20
 
 
 class PID(object):
-    def __init__(self, KP, KI, KD, reference):
+    def __init__(self, KP, KI, KD):
         self.kp = KP
         self.ki = KI
         self.kd = KD
-        self.setpoint = reference
         self.error = 0
         self.prev_error = 0
         self.prev_time = 0
@@ -19,8 +18,8 @@ class PID(object):
         self.u_output = 0
         self.count = 0
 
-    def controller(self, measured_value: float, time: float):
-        self.error = self.setpoint - measured_value
+    def controller(self, reference: float, measured_value: float, time: float):
+        self.error = reference - measured_value
         self.proportional_error = self.error
         self.integral_error += self.error * (time - self.prev_time)
         # # capping integral
@@ -40,13 +39,10 @@ class PID(object):
             self.u_output = MAX_OUTPUT
         elif self.u_output < 0:
             self.u_output = 0
-        print(f'u: {self.u_output}, r: {self.setpoint}, '
+        print(f'u: {self.u_output}, r: {reference}, '
               f'y: {measured_value}, e: {self.error}')
         self.count += 1
         return self.u_output
-
-    def set_reference(self, reference):
-        self.setpoint = reference
 
     def get_error(self):
         return self.error
