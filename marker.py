@@ -21,3 +21,6 @@ class Marker(object):
 
     def set_pos(self, pos):
         self.marker.goto(0, pos)
+
+# rotate
+# left/right degree, forward move

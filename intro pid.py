@@ -3,8 +3,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import marker
 
-
+# model
 # mass spring damper system
+# input F, force
+# output x, position
+# m: mass, b: friction constant, k: spring constant
 # mx.. + bx. + kx = F
 # ms^2X + bsX + kX = F
 # X/F = 1 / (ms^2 + bs + k)
@@ -132,10 +135,11 @@ plt.title('PID')
 plt.xlabel('time')
 plt.ylabel('amplitude')
 
-mark = marker.Marker(0, 1*100)
+scale = 100
+mark = marker.Marker(0, 1*scale)
 for i in range(len(y)):
     pos = y[i]
-    mark.set_pos(pos*100)
+    mark.set_pos(pos*scale)
 
 # plt.figure(2)
 # poles of TF (denom = 0) have negative real parts -> stable

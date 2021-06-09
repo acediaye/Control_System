@@ -7,6 +7,7 @@ from control import tf, feedback, step_response
 # model
 # input u, force
 # output v, velocity
+# m: mass, b: friction constant, v: velocity
 # mv. + bv = u
 # msV + bV = U
 # V/U = 1 / (ms + b)
@@ -27,12 +28,21 @@ KI = 40
 KD = 100
 s = tf('s')
 plant = 1 / (mass*s + b)
+print(plant)
 controller = KP + KI/s + KD*s
 h = feedback(controller*plant, 1)
 
 t, y = step_response(REF*h)
+print(y)
 r = REF * np.ones(len(t))
 plt.figure(1)
 plt.plot(t, y)
 plt.plot(t, r)
+
+scale = 10
+mark = marker.Marker(0, REF*scale)
+for i in range(len(y)):
+    pos = y[i]
+    mark.set_pos(pos*scale)
+
 plt.show()
