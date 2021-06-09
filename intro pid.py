@@ -136,7 +136,8 @@ plt.xlabel('time')
 plt.ylabel('amplitude')
 
 scale = 100
-mark = marker.Marker(0, 1*scale)
+mark = marker.Marker()
+mark.linear(0, 1*scale)
 for i in range(len(y)):
     pos = y[i]
     mark.set_pos(pos*scale)

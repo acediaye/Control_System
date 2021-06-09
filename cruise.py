@@ -40,7 +40,8 @@ plt.plot(t, y)
 plt.plot(t, r)
 
 scale = 10
-mark = marker.Marker(0, REF*scale)
+mark = marker.Marker()
+mark.linear(0, REF*scale)
 for i in range(len(y)):
     pos = y[i]
     mark.set_pos(pos*scale)
