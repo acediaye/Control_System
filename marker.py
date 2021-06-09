@@ -27,15 +27,16 @@ class Marker(object):
 
     def angular(self, start, stop):
         # draw start line
+        radius = 200
         self.marker.left(start)
-        self.marker.forward(300)
+        self.marker.forward(radius)
         self.marker.penup()
         # draw end line
         self.marker.goto(0, 0)
         self.marker.setheading(0)
         self.marker.left(stop)
         self.marker.pendown()
-        self.marker.forward(300)
+        self.marker.forward(radius)
         self.marker.penup()
         # go to start position
         self.marker.goto(0, 0)
@@ -44,15 +45,10 @@ class Marker(object):
         self.marker.color('red')
 
     def set_deg(self, rad):
+        radius = 200
         deg = np.rad2deg(rad)
-        self.marker.goto(0, 0)
-        self.marker.setheading(0)
-        self.marker.left(deg)
-        self.marker.pendown()
-        self.marker.forward(200)
-        self.marker.undo()
-        # self.marker.penup()
-        # self.marker.clear()
+        self.marker.setheading(deg)
+        self.marker.goto(radius*np.cos(rad), radius*np.sin(rad))
 
 # rotate
 # left/right degree, forward move
