@@ -1,9 +1,13 @@
-from control import tf, feedback, series, step_response
+from control import tf, feedback, series, step_response, pzmap, bode_plot
 import matplotlib.pyplot as plt
 import numpy as np
+import marker
+
 
 # mass spring damper system
 # mx.. + bx. + kx = F
+# ms^2X + bsX + kX = F
+# X/F = 1 / (ms^2 + bs + k)
 # Kp + Ki/s + Kd*s
 
 m = 1  # kg
@@ -127,5 +131,20 @@ plt.plot(t, reference)
 plt.title('PID')
 plt.xlabel('time')
 plt.ylabel('amplitude')
+
+mark = marker.Marker(0, 1*100)
+for i in range(len(y)):
+    pos = y[i]
+    mark.set_pos(pos*100)
+
+# plt.figure(2)
+# poles of TF (denom = 0) have negative real parts -> stable
+# any pole has positive real part -> unstable
+# any pair of poles on imaginary axis -> oscillate
+poles, zeros = pzmap(h, plot=False)
+print(f'poles: {poles}')
+print(f'zeros: {zeros}')
+# plt.figure(3)
+mag, phase, omega = bode_plot(h, plot=False)
 
 plt.show()
