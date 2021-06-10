@@ -39,11 +39,11 @@ plt.figure(1)
 plt.plot(t, y)
 plt.plot(t, r)
 
-scale = 10
 mark = marker.Marker()
-mark.linear(0, REF*scale)
+mark.set_scale(10)
+mark.linear(0, REF)
 for i in range(len(y)):
     pos = y[i]
-    mark.set_pos(pos*scale)
+    mark.set_pos(pos)
 
 plt.show()

@@ -3,7 +3,18 @@ import matplotlib.pyplot as plt
 
 
 class PID(object):
-    def __init__(self, KP, KI, KD):
+    def __init__(self, KP: float, KI: float, KD: float):
+        """[PID controller]
+
+        Parameters
+        ----------
+        KP : [float]
+            [proportional constant]
+        KI : [float]
+            [integral constant]
+        KD : [float]
+            [derivative constant]
+        """
         self.kp = KP
         self.ki = KI
         self.kd = KD
@@ -24,7 +35,24 @@ class PID(object):
         self.kie = np.array([])
         self.kde = np.array([])
 
-    def controller(self, reference: float, measured_value: float, time: float):
+    def controller(self, reference: float, measured_value: float,
+                   time: float) -> float:
+        """[discrete PID calculations]
+
+        Parameters
+        ----------
+        reference : float
+            [setpoint]
+        measured_value : float
+            [feedback]
+        time : float
+            [time instance]
+
+        Returns
+        -------
+        float
+            [controller output]
+        """
         time_step = time - self.prev_time
         self.error = reference - measured_value
         self.proportional_error = self.error
