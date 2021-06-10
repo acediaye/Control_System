@@ -8,6 +8,7 @@ class Marker(object):
         self.marker.speed(0)  # instant speed
         self.radius = 200
         self.length = 200
+        self.scale = 1
 
     def linear(self, start, stop):
         # draw start line
@@ -15,7 +16,7 @@ class Marker(object):
         self.marker.forward(self.length)
         self.marker.penup()
         # draw stop line
-        self.marker.goto(-100, stop)
+        self.marker.goto(-100, self.scale * stop)
         self.marker.pendown()
         self.marker.forward(self.length)
         self.marker.penup()
@@ -25,11 +26,14 @@ class Marker(object):
         self.marker.color('red')
 
     def set_pos(self, pos):
-        self.marker.goto(0, pos)
+        self.marker.goto(0, self.scale * pos)
+
+    def set_scale(self, scale):
+        self.scale = scale
 
     def angular(self, start, stop):
         # draw start line
-        self.marker.left(start)
+        self.marker.setheading(start)
         self.marker.forward(self.radius)
         self.marker.penup()
         # draw end line

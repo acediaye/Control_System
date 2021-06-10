@@ -45,15 +45,15 @@ plt.figure(1)
 plt.plot(t, y)
 plt.plot(t, r)
 
-scale = 100
 mark = marker.Marker()
-mark.linear(0, REF*scale)
+mark.set_scale(100)
+mark.linear(0, REF)
 # mark.angular(0, 135)
 print(len(y))
 for i in range(len(y)):
     pos = y[i]
-    mark.set_pos(pos*scale)
+    mark.set_pos(pos)
     # mark.set_deg(pos)
-    print(i)
+    # print(i)
 
 plt.show()
