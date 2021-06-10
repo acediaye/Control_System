@@ -135,12 +135,12 @@ plt.title('PID')
 plt.xlabel('time')
 plt.ylabel('amplitude')
 
-scale = 100
-mark = marker.Marker()
-mark.linear(0, 1*scale)
-for i in range(len(y)):
-    pos = y[i]
-    mark.set_pos(pos*scale)
+# mark = marker.Marker()
+# mark.set_scale(100)
+# mark.linear(0, 1)
+# for i in range(len(y)):
+#     pos = y[i]
+#     mark.set_pos(pos)
 
 # plt.figure(2)
 # poles of TF (denom = 0) have negative real parts -> stable
