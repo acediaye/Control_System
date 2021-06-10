@@ -24,6 +24,7 @@ class model(object):
         self.acc = self.g + thrust / self.mass
         self.vel += self.acc * TIME_STEP
         self.pos += self.vel * TIME_STEP
+        # self.pos = thrust
         return self.pos
 
     def get_pos(self):
