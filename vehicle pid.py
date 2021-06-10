@@ -46,6 +46,7 @@ if __name__ == '__main__':
     mypid = pid.PID(KP, KI, KD)
     # clip inputs to -50% to 100%
     mypid.set_output_saturation(-50, 100)
+    mypid.set_integral_saturation(-20, 20)
     for i in range(len(TIME)):
         t = TIME[i]
         r = REF[i]
@@ -77,4 +78,5 @@ if __name__ == '__main__':
     plt.ylabel('Error')
     plt.xlabel('Time (sec)')
     plt.legend(['Error'])
+    # mypid.graph_pid_errors()
     plt.show()
