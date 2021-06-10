@@ -44,6 +44,7 @@ KD = 1.35
 if __name__ == '__main__':
     mypid = pid.PID(KP, KI, KD)
     mypid.set_output_saturation(0, 20)
+    mypid.set_integral_saturation(-20, 30)
     mymodel = model(g, MASS)
     for i in range(len(TIME)):
         t = TIME[i]
@@ -61,13 +62,15 @@ if __name__ == '__main__':
     print(mypid.count)
     plt.figure(1)
     plt.subplot(3, 1, 1)
-    plt.plot(time_arr, y_arr)
-    plt.plot(time_arr, r_arr)
+    plt.plot(time_arr, y_arr, 'b')
+    plt.plot(time_arr, r_arr, 'k')
     plt.ylabel('y')
     plt.subplot(3, 1, 2)
-    plt.plot(time_arr, u_arr)
+    plt.plot(time_arr, u_arr, 'g')
     plt.ylabel('u')
     plt.subplot(3, 1, 3)
-    plt.plot(time_arr, e_arr)
+    plt.plot(time_arr, e_arr, 'r')
     plt.ylabel('e')
+    plt.xlabel('time')
+    # mypid.graph_pid_errors()
     plt.show()
