@@ -43,6 +43,7 @@ KD = 1.35
 
 if __name__ == '__main__':
     mypid = pid.PID(KP, KI, KD)
+    mypid.set_output_saturation(0, 20)
     mymodel = model(g, MASS)
     for i in range(len(TIME)):
         t = TIME[i]

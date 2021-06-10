@@ -1,8 +1,5 @@
 import numpy as np
 
-MAX_OUTPUT = 20
-MAX_INTEGRAL = 20
-
 
 class PID(object):
     def __init__(self, KP, KI, KD):
@@ -17,6 +14,10 @@ class PID(object):
         self.derivative_error = 0
         self.u_output = 0
         self.count = 0
+        self.max_output = 100
+        self.min_output = 0
+        self.max_integral = 0
+        self.min_integral = 0
 
     def controller(self, reference: float, measured_value: float, time: float):
         self.error = reference - measured_value
@@ -35,10 +36,10 @@ class PID(object):
         self.prev_error = self.error
         self.prev_time = time
         # saturation
-        if self.u_output > MAX_OUTPUT:
-            self.u_output = MAX_OUTPUT
-        elif self.u_output < 0:
-            self.u_output = 0
+        if self.u_output > self.max_output:
+            self.u_output = self.max_output
+        elif self.u_output < self.min_output:
+            self.u_output = self.min_output
         print(f'u: {self.u_output}, r: {reference}, '
               f'y: {measured_value}, e: {self.error}')
         self.count += 1
@@ -60,3 +61,11 @@ class PID(object):
         self.kp = 0.6 * ku
         self.ki = 1.2 * ku / tu
         self.kd = 0.075 * ku * tu
+
+    def set_output_saturation(self, min, max):
+        self.min_output = min
+        self.max_output = max
+
+    def set_integral_saturation(self, min, max):
+        self.min_integral = min
+        self.max_integral = max
