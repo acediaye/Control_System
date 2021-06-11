@@ -57,9 +57,7 @@ class Simulation(object):
             r = REFERENCE[i]
             self.marker.set_reference(r)
             thrust = self.pid.controller(r, self.rocket.get_pos(), t)
-            self.rocket.set_acc(thrust)
-            self.rocket.set_vel()
-            self.rocket.set_pos()
+            self.rocket.excite(thrust)
             self.count += 1
 
             self.times = np.append(self.times, t)
@@ -136,25 +134,21 @@ class Rocket(object):
         self.g = g
         self.mass = mass
 
-    def set_acc(self, thrust):
+    def excite(self, thrust):
         # thrust is in newton, accel = force / mass
         self.acc = self.g + thrust / self.mass  # m/s^2 = N / kg
         print(f'accel: {self.acc}')
+        self.vel += self.acc * TIME_STEP
+        print(f'vel: {self.vel}')
+        self.pos += self.vel * TIME_STEP
+        print(f'pos: {self.pos}\n')
+        self.rocket.sety(self.pos)
 
     def get_acc(self):
         return self.acc
 
-    def set_vel(self):
-        self.vel += self.acc * TIME_STEP
-        print(f'vel: {self.vel}')
-
     def get_vel(self):
         return self.vel
-
-    def set_pos(self):
-        self.pos += self.vel * TIME_STEP
-        print(f'pos: {self.pos}\n')
-        self.rocket.sety(self.pos)
 
     def get_pos(self):
         self.pos = self.rocket.ycor()
