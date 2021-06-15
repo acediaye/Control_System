@@ -21,10 +21,10 @@ class model(object):
         self.g = g
 
     def excite(self, thrust):
-        self.acc = self.g + thrust / self.mass
-        self.vel += self.acc * TIME_STEP
-        self.pos += self.vel * TIME_STEP
-        # self.pos = thrust
+        # self.acc = self.g + thrust / self.mass
+        # self.vel += self.acc * TIME_STEP
+        # self.pos += self.vel * TIME_STEP
+        self.pos = thrust + 0
         return self.pos
 
     def get_pos(self):
